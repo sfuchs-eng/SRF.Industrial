@@ -1,27 +1,30 @@
-﻿using System.Net;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
 namespace SRF.Industrial.Modbus;
 
 public class ModbusClient : IDisposable
 {
     private readonly TcpClient tcpClient;
+    private readonly ModbusClientConfig config;
 
     public ModbusClient(ModbusClientConfig config)
     {
         this.tcpClient = new TcpClient();
+        this.config = config;
+
+        if (string.IsNullOrEmpty(config.Server))
+        {
+            throw new ArgumentException($"{nameof(config.Server)} must not be null or empty.");
+        }
     }
 
-    public async void Connect(string host, ushort port)
+    public async void Connect()
     {
-        if (string.IsNullOrEmpty(host))
-            throw new ArgumentNullException(nameof(host));
-
-        await tcpClient.ConnectAsync()
+        await tcpClient.ConnectAsync(config.Server!, config.Port);
     }
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        tcpClient.Close();
     }
 }

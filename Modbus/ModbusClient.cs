@@ -7,6 +7,8 @@ public class ModbusClient : IDisposable
     private readonly TcpClient tcpClient;
     private readonly ModbusClientConfig config;
 
+    public bool IsConnected => tcpClient?.Connected ?? false;
+
     public ModbusClient(ModbusClientConfig config)
     {
         this.tcpClient = new TcpClient();
@@ -21,6 +23,7 @@ public class ModbusClient : IDisposable
     public async void Connect()
     {
         await tcpClient.ConnectAsync(config.Server!, config.Port);
+        var ns = tcpClient.GetStream();
     }
 
     public void Dispose()

@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../Packets/SRF.Industrial.Packets.csproj" />
+  </ItemGroup>
+
 </Project>

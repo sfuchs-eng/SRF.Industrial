@@ -26,8 +26,29 @@ public class ModbusClient : IDisposable
         var ns = tcpClient.GetStream();
     }
 
+    ~ModbusClient()
+    {
+        Dispose(false);
+    }
+
+    private bool _disposed = false;
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            tcpClient.Close();
+            tcpClient.Dispose();
+        }
+        _disposed = true;
+    }
+
     public void Dispose()
     {
-        tcpClient.Close();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

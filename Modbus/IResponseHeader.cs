@@ -3,7 +3,6 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
 
-public interface IResponseHeader : IPacketSegment
+public interface IResponseHeader : IPacket
 {
-
 }

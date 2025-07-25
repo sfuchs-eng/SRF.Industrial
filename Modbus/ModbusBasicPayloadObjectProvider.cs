@@ -1,4 +1,5 @@
 using System;
+using SRF.Industrial.Modbus.Packets;
 using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
@@ -7,8 +8,14 @@ public class ModbusBasicPayloadObjectProvider : IPayloadObjectProvider
 {
     public bool AssignPayload(IPacket header, bool isResponse = true)
     {
-        if ( header is not Packets.FunctionCode functionCode)
-            return false;
+        if (header is Packets.ModbusApplicationProtocolHeader mbap)
+        {
+            mbap.Payload = new Packets.FunctionCode();
+            return true;
+        }
+            
+        if (header is not Packets.FunctionCode functionCode)
+                return false;
 
         if (!isResponse)
         {
@@ -25,7 +32,28 @@ public class ModbusBasicPayloadObjectProvider : IPayloadObjectProvider
             functionCode.Payload = pl;
             return true;
         }
+        else
+        {
+            // Responses: Exception?
+            if (((ModbusFunctionCodesBasic)functionCode.Function).HasFlag(ModbusFunctionCodesBasic.ErrorResponseMask))
+            {
+                functionCode.Payload = new Packets.ExceptionResponse();
+                return true;
+            }
 
-        return false;
+            // Responses: regular
+            IResponseHeader? pl = (ModbusFunctionCodesBasic)functionCode.Function switch
+            {
+                ModbusFunctionCodesBasic.ReadRegisters => new RegisterValues(),
+                ModbusFunctionCodesBasic.WriteRegister => new WriteRegister(),
+                ModbusFunctionCodesBasic.WriteMultipleRegisters => new MultipleRegistersWritten(),
+                _ => null
+            };
+
+            if (pl == null)
+                return false;
+            functionCode.Payload = pl;
+            return true;
+        }
     }
 }

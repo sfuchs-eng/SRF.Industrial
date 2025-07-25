@@ -3,10 +3,10 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Packets;
 
-public class ReadRegisters : ICommandHeader
+public class MultipleRegistersWritten : IResponseHeader
 {
-    public ushort StartAddress { get; set; } = 0;
-    public ushort NoRegisters { get; set; } = 0;
+    public ushort StartAddress { get; set; }
+    public ushort NoRegisters { get; set; }
 
     public IPacket? Payload => null;
 
@@ -22,5 +22,10 @@ public class ReadRegisters : ICommandHeader
         writer.Write(NoRegisters);
     }
 
-    public ulong Measure() => 4;
+    public int Measure() => 4;
+
+    public int RequireAdditionalBytes(BinaryReader bufferReader, int noBytesInBuffer)
+    {
+        throw new NotImplementedException();
+    }
 }

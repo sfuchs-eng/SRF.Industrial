@@ -16,9 +16,11 @@ public class FunctionCode : IPacket
         Function = (byte)functionCode;
     }
 
-    public void Decode(BinaryReader reader)
+    public void Decode(BinaryReader reader, IEnumerable<IPayloadObjectProvider> payloadProviders)
     {
         Function = reader.ReadByte();
+        if (payloadProviders.Any(pp => pp.AssignPayload(this)))
+            Payload?.Decode(reader, payloadProviders);
     }
 
     public void Encode(BinaryWriter writer)
@@ -26,5 +28,13 @@ public class FunctionCode : IPacket
         writer.Write(Function);
     }
 
-    public ulong Measure() => 1 + Payload?.Measure() ?? 0;
+    public int Measure() => 1 + Payload?.Measure() ?? 0;
+
+    /// <summary>
+    /// Don't use - instead use the same method of <see cref="ModbusApplicationProtocolHeader"/>.
+    /// </summary>
+    public int RequireAdditionalBytes(BinaryReader bufferReader, int noBytesInBuffer)
+    {
+        return 2 - noBytesInBuffer; // any further payload packets is subject to superior MBAP header data length.
+    }
 }

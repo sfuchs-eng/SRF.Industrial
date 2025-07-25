@@ -31,11 +31,14 @@ public abstract class Packet : IPacket
     /// <summary>
     /// Header only length of present packet in bytes, without payload size.
     /// </summary>
-    protected virtual ulong HeaderLength => 0;
+    protected virtual int HeaderLength => 0;
 
     /// <summary>
-    /// Determine packet size. <see cref="Payload"/> must be fully configured (or null to yield 0)
+    /// Determine packet size from a configured object. <see cref="Payload"/> must be fully configured (or null to yield 0)
+    /// This method is used to determine how many bytes an <see cref="Encode(BinaryWriter)"/> call would write.
     /// </summary>
     /// <returns>Total size in bytes, <see cref="HeaderLength"/> + <see cref="Payload.Measure()"/></returns>
-    public virtual ulong Measure() => HeaderLength + Payload?.Measure() ?? 0;
+    public virtual int Measure() => HeaderLength + Payload?.Measure() ?? 0;
+
+    public abstract int RequireAdditionalBytes(BinaryReader bufferReader, int noBytesInBuffer);
 }

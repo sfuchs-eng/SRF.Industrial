@@ -1,4 +1,8 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SRF.Industrial.Modbus.Packets;
+using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
 
@@ -6,24 +10,40 @@ public class ModbusClient : IDisposable
 {
     private readonly TcpClient tcpClient;
     private readonly ModbusClientConfig config;
+    private readonly ILogger<ModbusClient> logger;
+    private readonly bool EndianSwap;
+
+    public int RxBufferSize { get; set; } = 1 << 14;
 
     public bool IsConnected => tcpClient?.Connected ?? false;
 
-    public ModbusClient(ModbusClientConfig config)
+    /// <summary>
+    /// List of factories creating <see cref="IPacket"/> objects representing the payload of a given header packet.
+    /// Used for decoding received modbus messages.
+    /// </summary>
+    public List<IPayloadObjectProvider> PayloadObjectProviders { get; set; } = new List<IPayloadObjectProvider>(16);
+
+    public ModbusClient(ModbusClientConfig config, ILogger<ModbusClient> logger)
     {
         this.tcpClient = new TcpClient();
         this.config = config;
-
+        this.logger = logger;
         if (string.IsNullOrEmpty(config.Server))
         {
             throw new ArgumentException($"{nameof(config.Server)} must not be null or empty.");
         }
+
+        EndianSwap = BitConverter.IsLittleEndian && config.Endianness == ModbusEndianness.BigEndian ||
+                    !BitConverter.IsLittleEndian && config.Endianness == ModbusEndianness.LittleEndian;
+
+        PayloadObjectProviders.AddRange([
+            new ModbusBasicPayloadObjectProvider()
+        ]);
     }
 
     public async void Connect()
     {
         await tcpClient.ConnectAsync(config.Server!, config.Port);
-        var ns = tcpClient.GetStream();
     }
 
     ~ModbusClient()
@@ -50,5 +70,60 @@ public class ModbusClient : IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public async Task<ModbusApplicationProtocolHeader> TransceivePacketAsync(ModbusApplicationProtocolHeader tx, CancellationToken cancel)
+    {
+        try
+        {
+            var txSize = int.CreateChecked(tx.Measure());
+            using var txBuf = new PacketBuffer(txSize, EndianSwap);
+            tx.Encode(txBuf.Writer);
+            var len = txBuf.Writer.BaseStream.Position;
+            await tcpClient.GetStream().WriteAsync(
+                    txBuf.Buffer.AsMemory(0, int.CreateChecked(len)),
+                    CancellationTokenSource.CreateLinkedTokenSource(
+                        cancel,
+                        new CancellationTokenSource(TimeSpan.FromSeconds(config.TransmitTimeoutSec)).Token
+                    )
+                    .Token
+                    );
+        }
+        catch (Exception exTx)
+        {
+            logger.LogWarning(exTx, "Modbus transmission failed.");
+            throw new ModbusException("Modbus transmission failed.", exTx);
+        }
+
+        try
+        {
+            using var rxBuf = new PacketBuffer(RxBufferSize, EndianSwap);
+            var pkt = new ModbusApplicationProtocolHeader();
+            int received = 0;
+            int readNoBytes = pkt.RequireAdditionalBytes(rxBuf.Reader, 0);
+            while (readNoBytes > 0)
+            {
+                await tcpClient.GetStream().ReadExactlyAsync(
+                    rxBuf.Buffer,
+                    received,
+                    readNoBytes,
+                    CancellationTokenSource.CreateLinkedTokenSource(
+                        cancel,
+                        new CancellationTokenSource(TimeSpan.FromSeconds(config.ReceiveTimeoutSec)).Token
+                    )
+                    .Token
+                    );
+                received += readNoBytes;
+                readNoBytes = pkt.RequireAdditionalBytes(rxBuf.Reader, received);
+            }
+            rxBuf.Reader.BaseStream.Position = 0;
+            pkt.Decode(rxBuf.Reader, PayloadObjectProviders);
+            return pkt;
+        }
+        catch (Exception exRx)
+        {
+            logger.LogWarning(exRx, "Modbus packet reception failed.");
+            throw new ModbusException("Modbus packet reception failed.", exRx);
+        }
     }
 }

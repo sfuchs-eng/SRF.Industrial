@@ -14,7 +14,7 @@ public class WriteMultipleRegisters : ICommandHeader
 
     public IPacket? Payload => null;
 
-    public void Decode(BinaryReader reader)
+    public void Decode(BinaryReader reader, IEnumerable<IPayloadObjectProvider> payloadProviders)
     {
         StartAddress = reader.ReadUInt16();
         var noRegisters = reader.ReadUInt16();
@@ -33,5 +33,5 @@ public class WriteMultipleRegisters : ICommandHeader
             writer.Write(val);
     }
 
-    public ulong Measure() => 5 + 2 * (ulong)Values.Length;
+    public int Measure() => 5 + 2 * Values.Length;
 }

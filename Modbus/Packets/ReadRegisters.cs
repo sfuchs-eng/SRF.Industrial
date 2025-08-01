@@ -22,5 +22,5 @@ public class ReadRegisters : ICommandHeader
         writer.Write(NoRegisters);
     }
 
-    public ulong Measure() => 4;
+    public int Measure() => 4;
 }

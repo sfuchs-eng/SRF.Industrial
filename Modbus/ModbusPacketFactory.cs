@@ -49,6 +49,7 @@ public class ModbusPacketFactory : IPayloadObjectProvider
 
     public virtual bool AssignPayload(IPacket header, bool isResponse = true)
     {
+        // only proxy to others
         return packetProviders.Any(p => p.AssignPayload(header, isResponse));
     }
 

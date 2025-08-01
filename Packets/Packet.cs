@@ -39,6 +39,4 @@ public abstract class Packet : IPacket
     /// </summary>
     /// <returns>Total size in bytes, <see cref="HeaderLength"/> + <see cref="Payload.Measure()"/></returns>
     public virtual int Measure() => HeaderLength + Payload?.Measure() ?? 0;
-
-    public abstract int RequireAdditionalBytes(BinaryReader bufferReader, int noBytesInBuffer);
 }

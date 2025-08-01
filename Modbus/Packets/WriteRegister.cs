@@ -11,7 +11,7 @@ public class WriteRegister : ICommandHeader, IResponseHeader
 
     public IPacket? Payload => null;
 
-    public void Decode(BinaryReader reader)
+    public void Decode(BinaryReader reader, IEnumerable<IPayloadObjectProvider> payloadObjectProviders)
     {
         Address = reader.ReadUInt16();
         Value = reader.ReadUInt16();
@@ -23,5 +23,5 @@ public class WriteRegister : ICommandHeader, IResponseHeader
         writer.Write(Value);
     }
 
-    public ulong Measure() => 4;
+    public int Measure() => 4;
 }

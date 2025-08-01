@@ -9,7 +9,7 @@ public class ExceptionResponse : Packet
 
     public static bool IsException(byte functionCode) => (functionCode & 0x80) > 0;
 
-    protected override ulong HeaderLength => 1;
+    protected override int HeaderLength => 1;
 
     public override void Decode(BinaryReader reader, IEnumerable<IPayloadObjectProvider> payloadProviders)
     {

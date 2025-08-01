@@ -3,7 +3,7 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Packets;
 
-public class ModbusApplicationProtocolHeader : IPacket
+public class ModbusApplicationProtocolHeader : IPredictableLengthPacket
 {
     public ushort ProtocolIdentifier { get; set; } = 1;
     public ushort ProtocolType { get; set; } = 0;
@@ -57,5 +57,14 @@ public class ModbusApplicationProtocolHeader : IPacket
         var DataLength = bufferReader.ReadUInt16();
         bufferReader.BaseStream.Seek(0, SeekOrigin.Begin);
         return DataLength + 6 - noBytesInBuffer;
+    }
+
+    public T GetFunctionData<T>()
+    {
+        if (Payload is not FunctionCode fcPacket)
+            throw new ModbusException($"Expected {nameof(FunctionCode)} type payload but got {Payload?.GetType().Name ?? "<null>"}");
+        if (fcPacket.Payload is not T functionData)
+            throw new ModbusException($"Expected {typeof(T).FullName} as payload of function packet, but got '{fcPacket.Payload?.Payload?.GetType().FullName}'");
+        return functionData;
     }
 }

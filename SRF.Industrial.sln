@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Packets", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Modbus", "Modbus\SRF.Industrial.Modbus.csproj", "{A6B77280-099A-4139-B405-EF7DCE5E5BFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Modbus.Test", "Modbus.Test\SRF.Industrial.Modbus.Test.csproj", "{859CE416-15CD-4A01-8039-4620EB94BDB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{A6B77280-099A-4139-B405-EF7DCE5E5BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6B77280-099A-4139-B405-EF7DCE5E5BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6B77280-099A-4139-B405-EF7DCE5E5BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

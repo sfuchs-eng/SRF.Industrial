@@ -9,6 +9,8 @@ namespace SRF.Industrial.Modbus;
 
 public class ModbusClient : IDisposable
 {
+    #region Connectivity, transmitting, receiving
+
     private readonly TcpClient tcpClient;
     private readonly ModbusClientConfig config;
     private readonly ILogger<ModbusClient> logger;
@@ -24,10 +26,13 @@ public class ModbusClient : IDisposable
     /// </summary>
     public List<IPayloadObjectProvider> PayloadObjectProviders { get; set; } = new List<IPayloadObjectProvider>(16);
 
-    public ModbusClient(IOptions<ModbusClientConfig> options, ILogger<ModbusClient> logger)
+    public ModbusPacketFactory PacketFactory { get; set; }
+
+    public ModbusClient(IOptions<ModbusClientConfig> options, ModbusPacketFactory packetFactory, ILogger<ModbusClient> logger)
     {
         this.tcpClient = new TcpClient();
         this.config = options.Value;
+        PacketFactory = packetFactory;
         this.logger = logger;
         if (string.IsNullOrEmpty(config.Server))
         {
@@ -127,4 +132,18 @@ public class ModbusClient : IDisposable
             throw new ModbusException("Modbus packet reception failed.", exRx);
         }
     }
+
+    #endregion
+
+    #region Basic modbus functions
+
+    public async Task<ushort[]> ReadRegistersAsync(byte id, ushort startAddress, ushort noRegisters, CancellationToken cancel)
+    {
+        var tx = PacketFactory.ReadRegisters(id, startAddress, noRegisters);
+        var rx = await TransceivePacketAsync(tx, cancel);
+        var regs = rx.GetFunctionData<RegisterValues>();
+        return regs.Values;
+    }
+
+    #endregion
 }

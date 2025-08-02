@@ -5,8 +5,8 @@ namespace SRF.Industrial.Modbus;
 
 public class ModbusPacketFactory : IPayloadObjectProvider
 {
-    public virtual IPacket ReadRegisters(byte device, ushort startAddress, ushort noRegisters)
-        => new Packets.ModbusApplicationProtocolHeader()
+    public virtual ModbusApplicationProtocolHeader ReadRegisters(byte device, ushort startAddress, ushort noRegisters)
+        => new()
         {
             LogicalDeviceId = device,
             Payload = new FunctionCode(ModbusFunctionCodesBasic.ReadRegisters)
@@ -19,8 +19,8 @@ public class ModbusPacketFactory : IPayloadObjectProvider
             }
         };
 
-    public virtual IPacket WriteRegister(byte device, ushort registerAddress, ushort value)
-        => new ModbusApplicationProtocolHeader()
+    public virtual ModbusApplicationProtocolHeader WriteRegister(byte device, ushort registerAddress, ushort value)
+        => new()
         {
             LogicalDeviceId = device,
             Payload = new FunctionCode(ModbusFunctionCodesBasic.WriteRegister)
@@ -33,8 +33,8 @@ public class ModbusPacketFactory : IPayloadObjectProvider
             }
         };
 
-    public virtual IPacket WriteMultipleRegisters(byte device, ushort startAddress, IEnumerable<ushort> values)
-        => new ModbusApplicationProtocolHeader()
+    public virtual ModbusApplicationProtocolHeader WriteMultipleRegisters(byte device, ushort startAddress, IEnumerable<ushort> values)
+        => new()
         {
             LogicalDeviceId = device,
             Payload = new FunctionCode(ModbusFunctionCodesBasic.WriteMultipleRegisters)

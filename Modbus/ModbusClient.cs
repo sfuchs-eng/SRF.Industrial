@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SRF.Industrial.Modbus.Packets;
 using SRF.Industrial.Packets;
 
@@ -23,10 +24,10 @@ public class ModbusClient : IDisposable
     /// </summary>
     public List<IPayloadObjectProvider> PayloadObjectProviders { get; set; } = new List<IPayloadObjectProvider>(16);
 
-    public ModbusClient(ModbusClientConfig config, ILogger<ModbusClient> logger)
+    public ModbusClient(IOptions<ModbusClientConfig> options, ILogger<ModbusClient> logger)
     {
         this.tcpClient = new TcpClient();
-        this.config = config;
+        this.config = options.Value;
         this.logger = logger;
         if (string.IsNullOrEmpty(config.Server))
         {
@@ -41,9 +42,9 @@ public class ModbusClient : IDisposable
         ]);
     }
 
-    public async void Connect()
+    public async Task ConnectAsync(CancellationToken cancel)
     {
-        await tcpClient.ConnectAsync(config.Server!, config.Port);
+        await tcpClient.ConnectAsync(config.Server!, config.Port, cancel);
     }
 
     ~ModbusClient()

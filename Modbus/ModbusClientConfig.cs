@@ -2,7 +2,7 @@ namespace SRF.Industrial.Modbus;
 
 public class ModbusClientConfig
 {
-    public string? Server { get; set; }
+    public string Server { get; set; } = string.Empty;
 
     public Int32 Port { get; set; } = 502;
 

@@ -20,4 +20,6 @@ public class ExceptionResponse : Packet
     {
         writer.Write(ExceptionCode);
     }
+
+    public override int Measure() => 1;
 }

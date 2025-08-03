@@ -3,15 +3,18 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Packets;
 
-public class FunctionCode : IPacket
+/// <summary>
+/// The Modbus PDU acc. e.g. https://www.modbus.org/docs/Modbus_Messaging_Implementation_Guide_V1_0b.pdf
+/// </summary>
+public class ProtocolDataUnit : IPacket
 {
     public byte Function { get; set; } = 0;
 
     public IPacket? Payload { get; set; }
 
-    public FunctionCode() { }
+    public ProtocolDataUnit() { }
 
-    public FunctionCode(ModbusFunctionCodesBasic functionCode)
+    public ProtocolDataUnit(ModbusFunctionCodesBasic functionCode)
     {
         Function = (byte)functionCode;
     }
@@ -26,9 +29,10 @@ public class FunctionCode : IPacket
     public void Encode(BinaryWriter writer)
     {
         writer.Write(Function);
+        Payload?.Encode(writer);
     }
 
-    public int Measure() => 1 + Payload?.Measure() ?? 0;
+    public int Measure() => 1 + (Payload?.Measure() ?? 0);
 
     /// <summary>
     /// Don't use - instead use the same method of <see cref="ModbusApplicationProtocolHeader"/>.

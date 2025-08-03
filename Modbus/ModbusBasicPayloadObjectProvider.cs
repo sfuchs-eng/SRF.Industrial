@@ -10,11 +10,11 @@ public class ModbusBasicPayloadObjectProvider : IPayloadObjectProvider
     {
         if (header is Packets.ModbusApplicationProtocolHeader mbap)
         {
-            mbap.Payload = new Packets.FunctionCode();
+            mbap.Payload = new Packets.ProtocolDataUnit();
             return true;
         }
             
-        if (header is not Packets.FunctionCode functionCode)
+        if (header is not Packets.ProtocolDataUnit functionCode)
                 return false;
 
         if (!isResponse)

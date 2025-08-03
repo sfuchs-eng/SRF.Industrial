@@ -13,7 +13,7 @@ public class RegisterValues : IResponseHeader
     public void Decode(BinaryReader reader, IEnumerable<IPayloadObjectProvider> payloadProviders)
     {
         var noBytes = reader.ReadByte();
-        Values = new ushort[noBytes];
+        Values = new ushort[noBytes/2];
         for (int i = 0; i < Values.Length; i++)
         {
             Values[i] = reader.ReadUInt16();
@@ -30,9 +30,4 @@ public class RegisterValues : IResponseHeader
     }
 
     public int Measure() => NoBytes + 1;
-
-    public int RequireAdditionalBytes(BinaryReader bufferReader, int noBytesInBuffer)
-    {
-        throw new NotImplementedException("Cannot determine at this level");
-    }
 }

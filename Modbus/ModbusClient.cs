@@ -14,7 +14,7 @@ public class ModbusClient : IDisposable
     private readonly TcpClient tcpClient;
     private readonly ModbusClientConfig config;
     private readonly ILogger<ModbusClient> logger;
-    private readonly bool EndianSwap;
+    public bool EndianSwap { get; private init; }
 
     public int RxBufferSize { get; set; } = 1 << 14;
 

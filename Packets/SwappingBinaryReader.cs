@@ -50,7 +50,11 @@ public class SwappingBinaryReader : BinaryReader
 
     public override ushort ReadUInt16()
     {
-        return Swapper<ushort>(BitConverter.GetBytes(base.ReadUInt16()));
+        return Swapper<ushort>(
+            BitConverter.GetBytes(
+                base.ReadUInt16()
+            )
+        );
     }
 
     public override short ReadInt16()

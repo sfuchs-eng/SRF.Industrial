@@ -9,7 +9,7 @@ public class ModbusPacketFactory : IPayloadObjectProvider
         => new()
         {
             LogicalDeviceId = device,
-            Payload = new FunctionCode(ModbusFunctionCodesBasic.ReadRegisters)
+            Payload = new ProtocolDataUnit(ModbusFunctionCodesBasic.ReadRegisters)
             {
                 Payload = new ReadRegisters()
                 {
@@ -23,7 +23,7 @@ public class ModbusPacketFactory : IPayloadObjectProvider
         => new()
         {
             LogicalDeviceId = device,
-            Payload = new FunctionCode(ModbusFunctionCodesBasic.WriteRegister)
+            Payload = new ProtocolDataUnit(ModbusFunctionCodesBasic.WriteRegister)
             {
                 Payload = new WriteRegister()
                 {
@@ -37,7 +37,7 @@ public class ModbusPacketFactory : IPayloadObjectProvider
         => new()
         {
             LogicalDeviceId = device,
-            Payload = new FunctionCode(ModbusFunctionCodesBasic.WriteMultipleRegisters)
+            Payload = new ProtocolDataUnit(ModbusFunctionCodesBasic.WriteMultipleRegisters)
             {
                 Payload = new WriteMultipleRegisters()
                 {

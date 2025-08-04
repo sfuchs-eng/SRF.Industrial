@@ -8,7 +8,6 @@ namespace SRF.Industrial.Modbus.Registers;
 /// </summary>
 public class RegisterDefinition
 {
-    public required uint No { get; init; }
     public required string Label { get; init; }
     public required IRegister Register { get; init; }
     public required ushort Address { get; init; }

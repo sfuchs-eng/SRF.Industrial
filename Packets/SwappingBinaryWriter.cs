@@ -47,6 +47,11 @@ public class SwappingBinaryWriter : BinaryWriter
         base.Write(data);
     }
 
+    public override void Write(byte[] data)
+    {
+        writeByteArray(data);
+    }
+
     private readonly Action<byte[]> writeByteArray;
 
     public override void Write(Half value) => throw new NotImplementedException();

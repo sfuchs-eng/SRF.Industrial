@@ -1,16 +1,17 @@
-using System;
-using System.Runtime.InteropServices;
+using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Registers;
 
-public class RTNumbers<TRegisterValue> : RegisterType<TRegisterValue> where TRegisterValue : struct
+public class RTNumbers<TRegisterValue> : Register<TRegisterValue> where TRegisterValue : struct
 {
-    public TRegisterValue Value { get; set; }
-
-    public override void Decode(Span<ushort>  fromUShortRegisters)
+    public override void Decode(BinaryReader reader)
     {
-        // endianness of 32 bit modbus registers = sequence of ushorts?
-        Value = MemoryMarshal.Cast<ushort, TRegisterValue>(fromUShortRegisters)[0];
+        Value = reader.Read<TRegisterValue>();
+    }
+
+    public override void Encode(BinaryWriter writer)
+    {
+        writer.Write(Value);
     }
 }
 

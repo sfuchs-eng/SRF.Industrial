@@ -31,7 +31,7 @@ public class SwappingBinaryReader : BinaryReader
         _swapping = swap;
     }
 
-    private T Swapper<T>(byte[] data) where T : struct
+    public T Swapper<T>(byte[] data) where T : struct
     {
         if (IsSwapping)
             data.AsSpan().Reverse();

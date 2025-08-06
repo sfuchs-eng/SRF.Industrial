@@ -7,6 +7,7 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
 
+#warning Need to make ModbusClient thread safe with respect to itself and the RTU bus behind the TCP-RTU gateway.
 public class ModbusClient : IDisposable
 {
     #region Connectivity, transmitting, receiving

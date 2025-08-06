@@ -2,7 +2,7 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Registers;
 
-public class RTNumbers<TRegisterValue> : Register<TRegisterValue> where TRegisterValue : struct
+public class RNumbers<TRegisterValue> : Register<TRegisterValue> where TRegisterValue : struct
 {
     public override void Decode(BinaryReader reader)
     {
@@ -15,11 +15,11 @@ public class RTNumbers<TRegisterValue> : Register<TRegisterValue> where TRegiste
     }
 }
 
-public class RTByte : RTNumbers<Byte> { }
-public class RTInt16 : RTNumbers<Int16> { }
-public class RTInt32 : RTNumbers<Int32> { }
-public class RTUInt16 : RTNumbers<UInt16> { }
-public class RTUInt32 : RTNumbers<UInt32> { }
+public class RByte : RNumbers<Byte> { }
+public class RInt16 : RNumbers<Int16> { }
+public class RInt32 : RNumbers<Int32> { }
+public class RUInt16 : RNumbers<UInt16> { }
+public class RUInt32 : RNumbers<UInt32> { }
 
 /*
 Byte

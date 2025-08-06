@@ -1,17 +1,10 @@
+using SRF.Industrial.Modbus.Registers;
 using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Test;
 
 public class Registers
 {
-    [SetUp]
-    public void Setup()
-    { }
-
-    [TearDown]
-    public void Teardown()
-    { }
-
     private readonly bool requireSwapping = BitConverter.IsLittleEndian; // expect Modbus nodes to respect BigEndian encoding on bus.
 
     [Test]
@@ -33,5 +26,17 @@ public class Registers
         var writer = new SwappingBinaryWriter(new MemoryStream(targetBuf), requireSwapping);
         writer.Write<UInt32>(value);
         Assert.That(targetBuf, Is.EqualTo(sameValueModbus), "Encoded values differ.");
+    }
+
+    [Test]
+    public void Int32RegisterDecoding()
+    {
+        Int32 refValue = -0x12345678;
+        var reg = new RInt32() { Value = 0 };
+        var buf = new byte[4];
+        new SwappingBinaryWriter(new MemoryStream(buf), requireSwapping).Write(refValue);
+        var reader = new SwappingBinaryReader(new MemoryStream(buf), requireSwapping);
+        reg.Decode(reader);
+        Assert.That(reg.Value, Is.EqualTo(refValue), "Value mismatch");
     }
 }

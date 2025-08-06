@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,7 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
 
-#warning Need to make ModbusClient thread safe with respect to itself and the RTU bus behind the TCP-RTU gateway.
+#warning Allow ReadRegisters for an IEnumerable<RegisterDefinition> for a given device
 public class ModbusClient : IDisposable
 {
     #region Connectivity, transmitting, receiving
@@ -46,6 +47,16 @@ public class ModbusClient : IDisposable
         PayloadObjectProviders.AddRange([
             new ModbusBasicPayloadObjectProvider()
         ]);
+
+        // ensure thread safety with respect to "one command at once - transmit & receive"
+        TranscievingQueue = Channel.CreateBounded<TxRxPacketPair>(
+            new BoundedChannelOptions(1)
+            {
+                AllowSynchronousContinuations = true,
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = false,
+                SingleWriter = false
+            });
     }
 
     public async Task ConnectAsync(CancellationToken cancel)
@@ -79,7 +90,42 @@ public class ModbusClient : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    private class TxRxPacketPair(ModbusApplicationProtocolHeader tx)
+    {
+        public ModbusApplicationProtocolHeader Tx { get; } = tx;
+        public ModbusApplicationProtocolHeader? Rx { get; set; }
+    }
+
+    private readonly Channel<TxRxPacketPair> TranscievingQueue;
+
     public async Task<ModbusApplicationProtocolHeader> TransceivePacketAsync(ModbusApplicationProtocolHeader tx, CancellationToken cancel)
+    {
+        await TranscievingQueue.Writer.WriteAsync(new TxRxPacketPair(tx), cancel);
+        // above blocks if another Transceive is ongoing as the channel capacity is 1. Using a channel for that purpose prepares for potential later producer/consumer pattern implementations.
+        ModbusApplicationProtocolHeader? result = null;
+        Exception? failure = null;
+        bool ItemSuccessfullyRemoved = false;
+        try
+        {
+            result = await TransceivePacketAsyncNonLocked(tx, cancel);
+        }
+        catch (Exception ex)
+        {
+            failure = ex;
+        }
+        finally
+        {
+            // read from channel after transmit & receive have both completed.
+            ItemSuccessfullyRemoved = TranscievingQueue.Reader.TryRead(out TxRxPacketPair? trpp);
+        }
+        if ( !ItemSuccessfullyRemoved)
+            throw new ModbusException("Failed to dequeue synchronization item. Modbux transceiving might be fully blocked.", failure);
+        if (failure != null)
+            throw failure;
+        return result ?? throw new ModbusException("Transceive failed uncaught and unexplainable.");
+    }
+
+    private async Task<ModbusApplicationProtocolHeader> TransceivePacketAsyncNonLocked(ModbusApplicationProtocolHeader tx, CancellationToken cancel)
     {
         try
         {

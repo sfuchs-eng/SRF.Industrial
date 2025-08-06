@@ -22,6 +22,12 @@ public class SwappingBinaryWriter : BinaryWriter
         writeByteArray = swap ? WriteReverse : WriteStraight;
     }
 
+    public SwappingBinaryWriter(Stream output, bool swap = true) : base(output)
+    {
+        IsSwapping = swap;
+        writeByteArray = swap ? WriteReverse : WriteStraight;
+    }
+
     protected SwappingBinaryWriter(bool swap = true)
     {
         IsSwapping = swap;

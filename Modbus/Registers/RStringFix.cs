@@ -3,9 +3,9 @@ using System.Text;
 
 namespace SRF.Industrial.Modbus.Registers;
 
-public class RStringFix(int fixLength, System.Text.Encoding? encoding = null) : RString
+public class RStringFix(int fixLengthBytes, System.Text.Encoding? encoding = null) : RString
 {
-    public int FixLength { get; } = fixLength;
+    public int FixLength { get; } = fixLengthBytes;
     public Encoding Encoding { get; } = encoding ?? System.Text.Encoding.ASCII;
 
     public override void Decode(BinaryReader reader)

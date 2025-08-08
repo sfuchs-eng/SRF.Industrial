@@ -4,14 +4,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SRF.Industrial.Modbus.Packets;
+using SRF.Industrial.Modbus.Registers;
 using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus;
 
-#warning Allow ReadRegisters for an IEnumerable<RegisterDefinition> for a given device
+/// <summary>
+/// Ensure there's only 1 <see cref="ModbusClient"/> per RTU bus behind any Modbus TCP client being addressed.
+/// Methods ensure there's only 1 concurrent transmit-receive operation at a given time, also in a threaded context.
+/// </summary>
 public class ModbusClient : IDisposable
 {
-    #region Connectivity, transmitting, receiving
+    #region Connectivity
 
     private readonly TcpClient tcpClient;
     private readonly ModbusClientConfig config;
@@ -90,6 +94,10 @@ public class ModbusClient : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    #endregion
+
+    #region Transceiving
+
     private class TxRxPacketPair(ModbusApplicationProtocolHeader tx)
     {
         public ModbusApplicationProtocolHeader Tx { get; } = tx;
@@ -118,7 +126,7 @@ public class ModbusClient : IDisposable
             // read from channel after transmit & receive have both completed.
             ItemSuccessfullyRemoved = TranscievingQueue.Reader.TryRead(out TxRxPacketPair? trpp);
         }
-        if ( !ItemSuccessfullyRemoved)
+        if (!ItemSuccessfullyRemoved)
             throw new ModbusException("Failed to dequeue synchronization item. Modbux transceiving might be fully blocked.", failure);
         if (failure != null)
             throw failure;
@@ -182,14 +190,48 @@ public class ModbusClient : IDisposable
 
     #endregion
 
-    #region Basic modbus functions
 
-    public async Task<ushort[]> ReadRegistersAsync(byte id, ushort startAddress, ushort noRegisters, CancellationToken cancel)
+    #region Modbus functions
+
+    /// <summary>
+    /// Reads the defined registers and updates the values by invoking <see cref="IRegister.Decode(BinaryReader)"/>.
+    /// The addresses and lengths must be such that they fit one single ReadRegisters modbus function call (0x7b * ushort register). Otherwise, a <see cref="ModbusException"/> is thrown prior transmission on the bus.
+    /// </summary>
+    /// <param name="id">Modbus node from which to query the registers</param>
+    /// <param name="registers"></param>
+    /// <param name="cancel"></param>
+    public async Task ReadRegistersAsync(byte id, IEnumerable<RegisterDefinition> registers, CancellationToken cancel)
+    {
+        IOrderedEnumerable<RegisterDefinition> regs = registers.OrderBy(r => r.Address);
+        var firstReg = regs.First();
+        var lastReg = regs.Last();
+        var noRegsTotal = ushort.CreateChecked(lastReg.Address + lastReg.NoRegisters - firstReg.Address);
+        if (noRegsTotal < 0 || noRegsTotal > 0x7b)
+        {
+            var regsList = string.Join(", ", regs.Select(r => $"'{r.Label}'"));
+            throw new ModbusException($"Invalid no registers ({noRegsTotal} registers, from 0x{firstReg.Address.ToString("X4")} to 0x{lastReg.Address.ToString("X4")}): {regsList}");
+        }
+
+        var tx = PacketFactory.ReadRegisters(id, firstReg.Address, noRegsTotal);
+        var rx = await TransceivePacketAsync(tx, cancel);
+        var rv = rx.GetFunctionData<RegisterValues>();
+        rv.DecodeBuffer(regs, EndianSwap);
+    }
+
+    /// <summary>
+    /// Executes the ReadRegisters modbus function call for a range of consecutive registers.
+    /// </summary>
+    /// <param name="id">Modbus node to query</param>
+    /// <param name="startAddress"></param>
+    /// <param name="noRegisters"></param>
+    /// <param name="cancel"></param>
+    /// <returns>a <code>byte[]</code> buffer containing the consecutive register values</returns>
+    public async Task<byte[]> ReadRegistersAsync(byte id, ushort startAddress, ushort noRegisters, CancellationToken cancel)
     {
         var tx = PacketFactory.ReadRegisters(id, startAddress, noRegisters);
         var rx = await TransceivePacketAsync(tx, cancel);
         var regs = rx.GetFunctionData<RegisterValues>();
-        return regs.Values;
+        return regs.Buffer;
     }
 
     #endregion

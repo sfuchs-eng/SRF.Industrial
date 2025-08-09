@@ -3,8 +3,8 @@ using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Registers;
 
-public class RNumbers<TRegisterValue> : Register<TRegisterValue>, INumericRegister
-    where TRegisterValue : struct, INumber<TRegisterValue>
+public class RNumbers<TRegisterValue> : Register<TRegisterValue>, INumericRegister<TRegisterValue>
+    where TRegisterValue : struct
 {
     public override void Decode(BinaryReader reader)
     {

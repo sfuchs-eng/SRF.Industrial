@@ -7,3 +7,7 @@ public interface INumericRegister
 {
     public double GetScaledValue(double gain);
 }
+
+public interface INumericRegister<TRegisterValue> : INumericRegister where TRegisterValue : struct
+{
+}

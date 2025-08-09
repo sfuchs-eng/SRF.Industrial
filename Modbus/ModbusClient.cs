@@ -26,6 +26,8 @@ public class ModbusClient : IDisposable
 
     public bool IsConnected => tcpClient?.Connected ?? false;
 
+    public ModbusClientConfig Config { get => config; }
+
     /// <summary>
     /// List of factories creating <see cref="IPacket"/> objects representing the payload of a given header packet.
     /// Used for decoding received modbus messages.

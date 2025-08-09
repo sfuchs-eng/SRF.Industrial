@@ -73,7 +73,7 @@ public class PacketCoding
         1,
         // Function Code
         3,
-        // Register Values (Reg Regs Response)
+        // Register Values (Read Regs Response)
         4,          // no bytes in registers
         0x01, 0x02, // register 0
         0x03, 0x04  // register 1
@@ -145,9 +145,8 @@ public class PacketCoding
         Assert.Multiple(() =>
         {
             Assert.That(pktReadRegisters.NoBytes, Is.EqualTo(4), "Wrong number of bytes returned");
-            Assert.That(pktReadRegisters.Values[0], Is.EqualTo(0x0102), "Wrong value register 0");
-            Assert.That(pktReadRegisters.Values[1], Is.EqualTo(0x0304), "Wrong value register 1");
-            Assert.That(pktReadRegisters.Values, Has.Length.EqualTo(2), "Wrong number of registers read.");
+            Assert.That(pktReadRegisters.Buffer, Is.EqualTo(new byte[] { 0x01, 0x02, 0x03, 0x04 }));
+            Assert.That(pktReadRegisters.Buffer, Has.Length.EqualTo(4), "Wrong number of bytes read.");
         });
     }
 

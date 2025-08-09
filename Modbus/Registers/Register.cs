@@ -11,4 +11,9 @@ public abstract class Register<TRegisterValue> : IRegister<TRegisterValue>
     public abstract void Decode(BinaryReader reader);
 
     public abstract void Encode(BinaryWriter writer);
+
+    public override string ToString()
+    {
+        return Value?.ToString() ?? "null value";
+    }
 }

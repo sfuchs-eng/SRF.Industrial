@@ -1,8 +1,10 @@
+using System.Numerics;
 using SRF.Industrial.Packets;
 
 namespace SRF.Industrial.Modbus.Registers;
 
-public class RNumbers<TRegisterValue> : Register<TRegisterValue> where TRegisterValue : struct
+public class RNumbers<TRegisterValue> : Register<TRegisterValue>, INumericRegister
+    where TRegisterValue : struct, INumber<TRegisterValue>
 {
     public override void Decode(BinaryReader reader)
     {
@@ -13,13 +15,20 @@ public class RNumbers<TRegisterValue> : Register<TRegisterValue> where TRegister
     {
         writer.Write(Value);
     }
+
+    protected Func<double> GetValueAsDouble { get; init; } = () => throw new NotImplementedException();
+
+    public double GetScaledValue(double gain)
+    {
+        return GetValueAsDouble() * gain;
+    }
 }
 
-public class RByte : RNumbers<Byte> { }
-public class RInt16 : RNumbers<Int16> { }
-public class RInt32 : RNumbers<Int32> { }
-public class RUInt16 : RNumbers<UInt16> { }
-public class RUInt32 : RNumbers<UInt32> { }
+public class RByte : RNumbers<Byte> { public RByte() { GetValueAsDouble = () => (double)Value; } }
+public class RInt16 : RNumbers<Int16> { public RInt16() { GetValueAsDouble = () => (double)Value; } }
+public class RInt32 : RNumbers<Int32> { public RInt32() { GetValueAsDouble = () => (double)Value; } }
+public class RUInt16 : RNumbers<UInt16> { public RUInt16() { GetValueAsDouble = () => (double)Value; } }
+public class RUInt32 : RNumbers<UInt32> { public RUInt32() { GetValueAsDouble = () => (double)Value; } }
 
 /*
 Byte

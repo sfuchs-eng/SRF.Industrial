@@ -16,4 +16,19 @@ public class RegisterDefinition
     public double Gain { get; init; } = 1.0;
     public bool Readable { get; init; } = true;
     public bool Writable { get; init; } = false;
+
+    override public string ToString()
+    {
+        string valueString;
+
+        if (Register is INumericRegister rn)
+        {
+            var unitString = Unit != null ? $" {Unit}" : string.Empty;
+            valueString = $"{rn.GetScaledValue(Gain)}{unitString}"; // get scaling acc. gain right.
+        }
+        else
+            valueString = Register?.ToString() ?? "no register value";
+
+        return $"0x{Address.ToString("X4")} {Label}: {valueString}";
+    }
 }

@@ -6,12 +6,12 @@ using SRF.Industrial.Modbus.Packets;
 
 namespace SRF.Industrial.Modbus.Server;
 
-public abstract class ModbusTcpSlave : IModbusConnection
+public abstract class ModbusTcpConnection : IModbusConnection
 {
     private readonly Socket socket;
-    private readonly ILogger<ModbusTcpSlave> logger;
+    private readonly ILogger<ModbusTcpConnection> logger;
 
-    public ModbusTcpSlave(Socket socket, ILogger<ModbusTcpSlave> logger)
+    public ModbusTcpConnection(Socket socket, ILogger<ModbusTcpConnection> logger)
     {
         this.socket = socket;
         this.logger = logger;
@@ -35,8 +35,5 @@ public abstract class ModbusTcpSlave : IModbusConnection
         GC.SuppressFinalize(this);
     }
 
-    public virtual Task ExecuteAsync(CancellationToken cancel)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract Task ExecuteAsync(CancellationToken cancel);
 }

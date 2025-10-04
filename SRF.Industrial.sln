@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Modbus", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Modbus.Test", "Modbus.Test\SRF.Industrial.Modbus.Test.csproj", "{859CE416-15CD-4A01-8039-4620EB94BDB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRF.Industrial.Events", "Events\SRF.Industrial.Events.csproj", "{326E834E-9CB8-4D19-A6F0-ADA869E194CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{859CE416-15CD-4A01-8039-4620EB94BDB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{326E834E-9CB8-4D19-A6F0-ADA869E194CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{326E834E-9CB8-4D19-A6F0-ADA869E194CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{326E834E-9CB8-4D19-A6F0-ADA869E194CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326E834E-9CB8-4D19-A6F0-ADA869E194CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

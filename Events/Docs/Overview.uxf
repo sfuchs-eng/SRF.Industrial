@@ -1,0 +1,48 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>730</x><y>550</y><w>210</w><h>30</h></coordinates><panel_attributes>fg=red
+/EventTransformationDispatcher/</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLInterface</id><coordinates><x>200</x><y>580</y><w>60</w><h>70</h></coordinates><panel_attributes>IEvent</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLInterface</id><coordinates><x>310</x><y>210</y><w>100</w><h>70</h></coordinates><panel_attributes>IEventReceiver</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>290</x><y>320</y><w>170</w><h>100</h></coordinates><panel_attributes>fg=magenta
+/EventReceiver/
+--
+EventContextFactory</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>260</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>Relation</id><coordinates><x>220</x><y>370</y><w>90</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10;70;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>970</x><y>550</y><w>170</w><h>30</h></coordinates><panel_attributes>fg=red
+/EventProcessingDispatcher/</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLInterface</id><coordinates><x>70</x><y>430</y><w>320</w><h>100</h></coordinates><panel_attributes>IEventContext
+--
+Event : IEvent
+ProcessingSteps : LinkedList&lt;IEventHandlingQueue&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>220</x><y>520</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>UMLInterface</id><coordinates><x>160</x><y>710</y><w>140</w><h>90</h></coordinates><panel_attributes>fg=yellow
+IEventContextFactory
+--
+Create(IEvent)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>130</x><y>860</y><w>190</w><h>30</h></coordinates><panel_attributes>DefaultEventContextFactory</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>220</x><y>800</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLNote</id><coordinates><x>380</x><y>630</y><w>700</w><h>190</h></coordinates><panel_attributes>bg=blue
+1. EventReceiver receives/detects event and creates IEvent instance
+2. IEventContext is provided by the IEventContextFactory and
+enriched with IEvent and additional metadata as required by the EventReceiver
+3. IEventContext is passed to the NormationQueue of EventReceiver, being of type IEventTransformationDispatcher
+4. the Event with its context is treated in a sequence of Queues.
+In each queue, there can be multiple IEventHandlers either
+modifying the event or reacting upon it.</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLInterface</id><coordinates><x>650</x><y>380</y><w>180</w><h>90</h></coordinates><panel_attributes>IEventHandlingDispatcher
+--
+EnqueueEvent(IEventContext)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>830</x><y>450</y><w>110</w><h>120</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;100</additional_attributes></element><element><id>UMLNote</id><coordinates><x>780</x><y>70</y><w>190</w><h>40</h></coordinates><panel_attributes>IHostedService in red
+(e.g. queue-processors)
+bg=gray
+fg=red</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1010</x><y>450</y><w>60</w><h>120</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;40;100</additional_attributes></element><element><id>UMLClass</id><coordinates><x>880</x><y>380</y><w>180</w><h>80</h></coordinates><panel_attributes>/EventDispatcher/
+--
+EnqueueEvent(IEventContext)
+Register(IEventHandler)
+Unregister(IEventHandler)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>740</x><y>390</y><w>160</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;140;10</additional_attributes></element><element><id>Relation</id><coordinates><x>450</x><y>390</y><w>300</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;280;10</additional_attributes></element><element><id>UMLInterface</id><coordinates><x>1210</x><y>410</y><w>100</w><h>70</h></coordinates><panel_attributes>IEventHandler</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>370</x><y>890</y><w>340</w><h>80</h></coordinates><panel_attributes>Default context factory registers
+DefaultEventTransformationDispatcher and
+thereafter the DefaultEventProcessingDispatcher
+with the ProcessingSteps
+bg=#eeeeee</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>220</x><y>880</y><w>170</w><h>70</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;10;50;150;50</additional_attributes></element><element><id>UMLNote</id><coordinates><x>400</x><y>520</y><w>280</w><h>80</h></coordinates><panel_attributes>The TransformationDispatcher ensures
+sequential execution of registered handlers.
+Yet IEventContext / IEvent should be locked
+for modifications.
+bg=#eeeeee</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>670</x><y>560</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;60;10</additional_attributes></element><element><id>UMLNote</id><coordinates><x>1180</x><y>580</y><w>270</w><h>40</h></coordinates><panel_attributes>The ProcessingDispatcher aims for parallel
+execution of registered handlers.
+bg=#eeeeee</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1100</x><y>570</y><w>100</w><h>60</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;10;40;80;40</additional_attributes></element><element><id>Relation</id><coordinates><x>1050</x><y>420</y><w>220</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>200;10;10;10</additional_attributes></element><element><id>UMLNote</id><coordinates><x>450</x><y>70</y><w>300</w><h>40</h></coordinates><panel_attributes>Application specific IHostedService in magenta
+bg=gray
+fg=magenta</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>1000</x><y>70</y><w>190</w><h>40</h></coordinates><panel_attributes>other DI services in yellow
+bg=gray
+fg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>900</x><y>290</y><w>160</w><h>110</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+puts into queue &gt;
+according to
+IEventContext
+ .ProcessingSteps</panel_attributes><additional_attributes>10;90;10;20;130;20;130;90</additional_attributes></element></diagram>

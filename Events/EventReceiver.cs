@@ -7,7 +7,7 @@ namespace SRF.Industrial.Events;
 /// <summary>
 /// Base class for event receivers, deriving from <see cref="BackgroundService"/> and implementing <see cref="IEventReceiver"/>.
 /// Override ExecuteAsync to implement the event receiving and <see cref="IEvent"/> creation logic.
-/// Then call <see cref="EnqueEventForProcessing(IEvent, CancellationToken)"/> to create the <see cref="IEventContext"/>
+/// Then call <see cref="EnqueEventForProcessingAsync(IEvent, CancellationToken)"/> to create the <see cref="IEventContext"/>
 /// and enqueue it to the first <see cref="IEventHandlingDispatcher"/> in the context's queue list.
 /// </summary>
 public abstract class EventReceiver(
@@ -25,7 +25,7 @@ public abstract class EventReceiver(
     /// <param name="evt">the <see cref="IEvent"/></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected async Task EnqueEventForProcessing(IEvent evt, CancellationToken token)
+    protected async Task EnqueEventForProcessingAsync(IEvent evt, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(evt);
 

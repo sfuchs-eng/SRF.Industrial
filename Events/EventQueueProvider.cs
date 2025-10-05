@@ -24,6 +24,8 @@ public class EventQueueProvider : IEventQueueProvider
 
     public IEventQueue GetQueue(string name)
     {
-        return _cachedProcessingSequence.Single(x => x.Name.Equals(name));
+        var q = _cachedProcessingSequence.SingleOrDefault(x => x.Name.Equals(name))
+            ?? throw new KeyNotFoundException($"No event queue with name '{name}' is registered. Available queues: {string.Join(", ", _cachedProcessingSequence.Select(x => x.Name))}");
+        return q;
     }
 }

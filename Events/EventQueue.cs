@@ -4,11 +4,11 @@ using SRF.Industrial.Events.Abstractions;
 
 namespace SRF.Industrial.Events;
 
-public class EventQueue : IEventQueue
+public class EventQueue(string nameKey, ILogger<EventQueue> logger) : IEventQueue
 {
-    private readonly ILogger<EventQueue> logger;
+    private readonly ILogger<EventQueue> logger = logger;
 
-    public string Name { get; init; }
+    public string Name { get; init; } = nameKey;
 
     /// <summary>
     /// Queue of incoming events to be processed.
@@ -32,12 +32,6 @@ public class EventQueue : IEventQueue
     }
 
     protected readonly Lock handlerListLock = new();
-
-    public EventQueue(string nameKey, IEventQueueProvider eventQueueProvider, ILogger<EventQueue> logger)
-    {
-        this.logger = logger;
-        Name = nameKey;
-    }
 
     /// <summary>
     /// The list of registered event handlers.

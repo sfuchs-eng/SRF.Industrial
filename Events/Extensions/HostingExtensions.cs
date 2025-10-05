@@ -28,8 +28,8 @@ public static class HostingExtensions
             
         services.AddSingleton<IEventContextFactory<TEvent>, EventContextFactory<TEvent>>();
 
-        services.AddKeyedSingleton<IEventQueue, EventQueue>(transformQueueKey);
-        services.AddKeyedSingleton<IEventQueue, EventQueue>(processingQueueKey);
+        services.AddKeyedSingleton<IEventQueue, EventQueue>(transformQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));
+        services.AddKeyedSingleton<IEventQueue, EventQueue>(processingQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));
 
         services.AddHostedService(
             (s) => new EventTransformationDispatcher(

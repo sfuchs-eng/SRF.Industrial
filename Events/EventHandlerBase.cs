@@ -12,23 +12,13 @@ namespace SRF.Industrial.Events;
 /// The event handler is automatically registered with the queue obtained from the provider.
 /// </summary>
 /// <typeparam name="TEvent">Type of event to be handled.</typeparam>
-public abstract class EventHandlerBase<TEvent> : IEventHandler where TEvent : IEventContext
+public abstract class EventHandlerBase<TEvent>(
+    ILogger<EventHandlerBase<TEvent>> logger
+    ) : IEventHandler where TEvent : IEventContext
 {
-    protected readonly IEventQueue eventQueue;
-    protected readonly ILogger<EventHandlerBase<TEvent>> logger;
+    protected readonly ILogger<EventHandlerBase<TEvent>> logger = logger;
 
     protected bool ThrowOnUnsupportedEventType { get; set; } = false;
-
-    public EventHandlerBase(
-        string queueKey,
-        IEventQueueProvider eventQueueProvider,
-        ILogger<EventHandlerBase<TEvent>> logger
-    )
-    {
-        this.eventQueue = eventQueueProvider.GetQueue(queueKey);
-        this.eventQueue.Register(this);
-        this.logger = logger;
-    }
 
     public virtual Task HandleAsync(IEventContext eventContext, CancellationToken cancellationToken)
     {

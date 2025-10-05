@@ -12,4 +12,20 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Docs/README.md" Pack="true" PackagePath="Docs" Visible="True" />
+    <None Include="Docs/LICENSE.md" Pack="true" PackagePath="Docs" Visible="True" />
+    <None Include="Docs/Overview.svg" Pack="true" PackagePath="Docs" Visible="True" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <Version>0.1.0</Version>
+    <Authors>Stefan Fuchs</Authors>
+    <Company></Company>
+    <PackageLicenseFile>Docs/LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>Docs/README.md</PackageReadmeFile>
+  </PropertyGroup>
+
 </Project>

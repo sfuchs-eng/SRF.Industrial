@@ -4,9 +4,10 @@ using SRF.Industrial.Events.Abstractions;
 namespace SRF.Industrial.Events;
 
 public class EventProcessingDispatcher(
+    IEventQueue eventQueue,
     ILogger<EventProcessingDispatcher> logger,
     ILogger<EventDispatcher> baseLogger
-    ) : EventDispatcher(baseLogger)
+    ) : EventDispatcher(eventQueue, baseLogger)
 {
     private readonly ILogger<EventProcessingDispatcher> logger = logger;
 

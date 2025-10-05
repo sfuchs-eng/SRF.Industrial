@@ -8,9 +8,10 @@ namespace SRF.Industrial.Events;
 /// allowing each handler to modify the event/context for the next handler
 /// </summary>
 public class EventTransformationDispatcher(
+    IEventQueue eventQueue,
     ILogger<EventTransformationDispatcher> logger,
     ILogger<EventDispatcher> baseLogger
-        ) : EventDispatcher(baseLogger)
+        ) : EventDispatcher(eventQueue, baseLogger)
 {
     private readonly ILogger<EventTransformationDispatcher> logger = logger;
 

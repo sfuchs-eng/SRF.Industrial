@@ -6,7 +6,7 @@ namespace SRF.Industrial.Events;
 /// <summary>
 /// Basic implementation of IEventContext
 /// </summary>
-public class EventContext : IEventContext
+public class EventContext<TEvent> : IEventContext<TEvent> where TEvent : class, IEvent
 {
     public object? Id { get; set; }
 
@@ -16,7 +16,12 @@ public class EventContext : IEventContext
 
     public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
 
-    public ConcurrentQueue<IEventHandlingDispatcher> ProcessingSteps { get; } = [];
+    public ConcurrentQueue<IEventQueue> ProcessingSteps { get; } = [];
 
-    public required IEvent Event { get; init; }
+    public virtual required TEvent Event { get; set; }
+
+    IEvent IEventContext.GenericEvent
+    {
+        get => Event;
+    }
 }

@@ -12,15 +12,17 @@ public class EventQueueProvider : IEventQueueProvider
 
     public EventQueueProvider(
         IServiceProvider serviceProvider,
-        object[] defaultProcessingSequence,
+        object[] queuesListInDefaultProcessingSequence,
         ILogger<EventQueueProvider> logger
     )
     {
         this.logger = logger;
-        _cachedProcessingSequence = [.. defaultProcessingSequence.Select(k => serviceProvider.GetRequiredKeyedService<IEventQueue>(k))];
+        _cachedProcessingSequence = [.. queuesListInDefaultProcessingSequence.Select(k => serviceProvider.GetRequiredKeyedService<IEventQueue>(k))];
     }
 
     public IEventQueue[] DefaultProcessingSequence => _cachedProcessingSequence;
+
+    public IEnumerable<IEventQueue> AllQueues => _cachedProcessingSequence;
 
     public IEventQueue GetQueue(string name)
     {

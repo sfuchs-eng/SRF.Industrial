@@ -15,7 +15,7 @@ public abstract class EventReceiver(
     ILogger<EventReceiver> logger
     ) : BackgroundService, IEventReceiver
 {
-    private readonly ILogger<EventReceiver> logger = logger;
+    protected readonly ILogger<EventReceiver> logger = logger;
     public IEventContextFactory EventContextFactory { get; init; } = eventContextFactory ?? throw new ArgumentNullException(nameof(eventContextFactory));
 
     /// <summary>

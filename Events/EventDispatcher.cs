@@ -7,31 +7,35 @@ namespace SRF.Industrial.Events;
 /// <summary>
 /// Base class for event dispatchers, deriving from <see cref="BackgroundService"/> and implementing <see cref="IEventHandlingDispatcher"/>.
 /// </summary>
-public abstract class EventDispatcher(
-    IEventQueue eventQueue,
-    ILogger<EventDispatcher> logger
-    ) : BackgroundService, IEventHandlingDispatcher
+public abstract class EventDispatcher : BackgroundService, IEventHandlingDispatcher
 {
-    public string Name => this.GetType()?.FullName ?? nameof(EventDispatcher);
+    public string Name => $"{eventQueue.Name}-{this.GetType().Name}" ?? $"{this.GetType().FullName} without associated Queue!";
 
-    private readonly IEventQueue eventQueue = eventQueue;
-    private readonly ILogger<EventDispatcher> logger = logger;
+    private readonly IEventQueue eventQueue;
+    private readonly ILogger<EventDispatcher> logger;
+
+    public EventDispatcher(
+        IEventQueue eventQueue,
+        ILogger<EventDispatcher> logger
+    )
+    {
+        this.eventQueue = eventQueue;
+        this.logger = logger;
+    }
 
     protected virtual void FinishAndPassOnEvent(IEventContext eventContext)
     {
         ArgumentNullException.ThrowIfNull(eventContext);
 
         if (!eventContext.ProcessingSteps.TryDequeue(out var q))
-        {
-            logger.LogWarning("No further handling queues configured for event {EventId} of type {EventType}", eventContext.Id, eventContext.Type);
             return;
-        }
         q.EnqueueEvent(eventContext);
         logger.LogTrace("Passed on event {EventId} of type {EventType} to next handling queue {QueueName}", eventContext.Id, eventContext.Type, q.Name);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("Starting event dispatcher for queue {QueueName}", Name);
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -63,6 +67,7 @@ public abstract class EventDispatcher(
                 logger.LogError(ex, "Unexpected error in {QueueName}", Name);
             }
         }
+        logger.LogTrace("Stopping event dispatcher for queue {QueueName}", Name);
     }
 
     protected abstract Task InvokeHandlersAsync(IEventContext ctx, IEventHandler[] handlers, CancellationToken stoppingToken);

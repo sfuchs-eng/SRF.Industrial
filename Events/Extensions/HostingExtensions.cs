@@ -27,6 +27,7 @@ public static class HostingExtensions
             ));
             
         services.AddSingleton<IEventContextFactory<TEvent>, EventContextFactory<TEvent>>();
+        services.AddSingleton<IEventContextFactory>(s => s.GetRequiredService<IEventContextFactory<TEvent>>());
 
         services.AddKeyedSingleton<IEventQueue, EventQueue>(transformQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));
         services.AddKeyedSingleton<IEventQueue, EventQueue>(processingQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));

@@ -9,13 +9,15 @@ public class SampleTransformationHandler : EventHandlerBase<IEventContext<Sample
         ILogger<EventHandlerBase<IEventContext<SampleEvent>>> logger
     ) : base(logger)
     {
-        this.ThrowOnUnsupportedEventType = true;
+        base.ThrowOnUnsupportedEventType = true;
     }
+
+    private int invocationCount = 0;
 
     public override Task HandleAsync(IEventContext<SampleEvent> eventContext, CancellationToken cancellationToken)
     {
         // perform some transformation on the event (or replace the event object entirely by an assignable one)
-        eventContext.Event.DerivedProperty = eventContext.Event.Message.Length;
+        eventContext.Event.DerivedProperty = ++invocationCount; 
 
         logger.LogTrace("Transformed event {EventId} created at {EventCreatedAt}: {EventMessage} (DerivedProperty={DerivedProperty})",
             eventContext.Event.Id,

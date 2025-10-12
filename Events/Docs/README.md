@@ -2,14 +2,16 @@
 
 ## Purpose
 
-A framework foreseen to receive, transform and handle events from (physical) systems, received through arbitrary connections or internally generated.
+A framework foreseen to receive, transform and handle events from (physical) systems, received through arbitrary connections or in the app internally generated.
 Events can be routed across an arbitrary sequence of processing queues. The predefined default is first a transformation and thereafter processing (the actual handling) via another queue.
 
-Originally created to handle events in a home automation context, it can as well serve the handling of factory machine events and status transitions.
+Originally created to handle events in a home automation context, it can as well serve the handling of factory machine log and status transition events.
+
+It's not supposed to be a typical event bus connecting services in a microservice architecture. But it could serve as an in-app adapter to such an event bus.
 
 ## Function principle
 
-### Overview key types
+### Overview of key types
 
 ![Key types overview](Overview.svg)
 
@@ -39,3 +41,50 @@ Provide one or more custom `IEvent` per receiver and one signle corresponding `I
 For simple scenarios the implementation of the `IEvent` might be sufficient, covering `IEventContext<TEvent>` with the generic implementation
 provided by the library: `EventContext<TEvent>`
 
+## Usage sample code
+
+### Basic scenario
+
+Might still be available: [SRF.Industrial.Events.Sample, Version 0.1.0](https://sfuchs.ch/div/SRF.Industrial.Events.Sample.v0.1.0.tar.gz)
+
+### Complex scenarios
+
+Set up customized services, e.g. by modifying the services configuration of the basic scenario (code from version 0.1.0).
+
+```csharp
+public static IServiceCollection AddBasicEventsProcessing<TEvent>(this IServiceCollection services) where TEvent : class, IEvent
+{
+    var transformQueueKey = "EventTransformation";
+    var processingQueueKey = "EventProcessing";
+
+    services.AddSingleton<IEventQueueProvider,EventQueueProvider>(
+        (s) => new EventQueueProvider(
+            s,
+            [transformQueueKey, processingQueueKey],
+            s.GetRequiredService<ILogger<EventQueueProvider>>()
+        ));
+        
+    services.AddSingleton<IEventContextFactory<TEvent>, EventContextFactory<TEvent>>();
+    services.AddSingleton<IEventContextFactory>(s => s.GetRequiredService<IEventContextFactory<TEvent>>());
+
+    services.AddKeyedSingleton<IEventQueue, EventQueue>(transformQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));
+    services.AddKeyedSingleton<IEventQueue, EventQueue>(processingQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));
+
+    services.AddHostedService(
+        (s) => new EventTransformationDispatcher(
+            s.GetRequiredKeyedService<IEventQueue>(transformQueueKey),
+            s.GetRequiredService<ILogger<EventTransformationDispatcher>>(),
+            s.GetRequiredService<ILogger<EventDispatcher>>()
+        )
+    ); 
+    services.AddHostedService(
+        (s) => new EventProcessingDispatcher(
+            s.GetRequiredKeyedService<IEventQueue>(processingQueueKey),
+            s.GetRequiredService<ILogger<EventProcessingDispatcher>>(),
+            s.GetRequiredService<ILogger<EventDispatcher>>()
+        )
+    );
+
+    return services;
+}
+```

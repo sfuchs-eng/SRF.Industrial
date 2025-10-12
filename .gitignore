@@ -27,3 +27,4 @@ DotnetVersion/
 .LSOverride
 
 **/target/**
+Events.Sample/SRF.Industrial.Events.Sample.v0.1.0.tar.gz

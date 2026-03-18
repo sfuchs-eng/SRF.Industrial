@@ -7,10 +7,12 @@ namespace SRF.Industrial.Events.Sample;
 public class SampleEventReceiver(
     IHostApplicationLifetime applicationLifetime,
     IEventContextFactory eventContextFactory,
-    ILogger<SampleEventReceiver> mlogger
+    ILogger<SampleEventReceiver> mlogger,
+    TimeProvider timeProvider
         ) : EventReceiver(eventContextFactory, mlogger)
 {
     private readonly IHostApplicationLifetime applicationLifetime = applicationLifetime;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -21,7 +23,7 @@ public class SampleEventReceiver(
             .Select(_ => new SampleEvent()
             {
                 Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = _timeProvider.GetUtcNow(),
                 Message = $"It's all the same except {Random.Shared.Next(0, 1000)}"
             })
             .ToArray();

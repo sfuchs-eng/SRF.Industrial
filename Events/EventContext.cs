@@ -14,7 +14,7 @@ public class EventContext<TEvent> : IEventContext<TEvent> where TEvent : class, 
 
     public object? Source { get; set; }
 
-    public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset Timestamp { get; set; }
 
     public ConcurrentQueue<IEventQueue> ProcessingSteps { get; } = [];
 

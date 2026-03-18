@@ -5,15 +5,17 @@ namespace SRF.Industrial.Events;
 
 public class EventContextFactory<TEvent>(
         IEventQueueProvider eventQueueProvider,
-        ILogger<EventContextFactory<TEvent>> logger
+        ILogger<EventContextFactory<TEvent>> logger,
+        TimeProvider timeProvider
     ) : IEventContextFactory<TEvent> where TEvent : class, IEvent
 {
     private readonly IEventQueueProvider eventQueueProvider = eventQueueProvider;
     private readonly ILogger<EventContextFactory<TEvent>> logger = logger;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     public virtual Func<IEvent, object?> IdGetter { get; init; } = (evt) => null;
     public virtual Func<IEvent, object?> TypeGetter { get; init; } = (evt) => evt.GetType();
-    public virtual Func<IEvent, DateTimeOffset> TimestampGetter { get; init; } = (evt) => DateTimeOffset.UtcNow;
+    public virtual Func<IEvent, DateTimeOffset> TimestampGetter { get; init; } = (evt) => timeProvider.GetUtcNow();
 
     public async Task<IEventContext> CreateEventContextAsync(IEventReceiver eventReceiver, IEvent eventReceived)
     {

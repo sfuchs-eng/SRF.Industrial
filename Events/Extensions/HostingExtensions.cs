@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using SRF.Industrial.Events.Abstractions;
 
@@ -26,7 +27,14 @@ public static class HostingExtensions
                 s.GetRequiredService<ILogger<EventQueueProvider>>()
             ));
             
-        services.AddSingleton<IEventContextFactory<TEvent>, EventContextFactory<TEvent>>();
+        services.TryAddSingleton(TimeProvider.System);
+
+        services.AddSingleton<IEventContextFactory<TEvent>>(
+            (s) => new EventContextFactory<TEvent>(
+                s.GetRequiredService<IEventQueueProvider>(),
+                s.GetRequiredService<ILogger<EventContextFactory<TEvent>>>(),
+                s.GetRequiredService<TimeProvider>()
+            ));
         services.AddSingleton<IEventContextFactory>(s => s.GetRequiredService<IEventContextFactory<TEvent>>());
 
         services.AddKeyedSingleton<IEventQueue, EventQueue>(transformQueueKey, (s, o) => new EventQueue(o as string ?? throw new ArgumentNullException(nameof(o)), s.GetRequiredService<ILogger<EventQueue>>()));

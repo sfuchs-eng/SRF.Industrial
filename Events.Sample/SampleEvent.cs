@@ -9,7 +9,7 @@ namespace SRF.Industrial.Events.Sample;
 public class SampleEvent : IEvent
 {
     public Guid Id { get; init; }
-    public DateTime CreatedAt { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
     public required string Message { get; set; }
     public int? DerivedProperty { get; set; }
 }

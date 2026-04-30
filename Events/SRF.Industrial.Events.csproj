@@ -21,7 +21,7 @@
   <PropertyGroup>
     <PackageId>$(AssemblyName)</PackageId>
     <IncludeContentInPack>true</IncludeContentInPack>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Stefan Fuchs</Authors>
     <Company></Company>
     <PackageLicenseFile>Docs/LICENSE.md</PackageLicenseFile>

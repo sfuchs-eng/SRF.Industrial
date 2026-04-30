@@ -1,5 +1,13 @@
 # SRF.Industrial.Events
 
+## Status: discontinued - not helpful at all
+
+Pull the source code of this library into your project and adapt it to your needs if you want to use it.
+
+[https://github.com/sfuchs-eng/SRF.Industrial/tree/main/Events](https://github.com/sfuchs-eng/SRF.Industrial/tree/main/Events)
+
+**Development has discontinued even prior proper use. The package might get revoked.**
+
 ## Purpose
 
 A framework foreseen to receive, transform and handle events from (physical) systems, received through arbitrary connections or in the app internally generated.

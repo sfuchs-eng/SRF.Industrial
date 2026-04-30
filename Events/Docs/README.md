@@ -1,6 +1,6 @@
 # SRF.Industrial.Events
 
-## Status: discontinued - not helpful at all
+## Status: **discontinued** - not helpful at all
 
 Pull the source code of this library into your project and adapt it to your needs if you want to use it.
 

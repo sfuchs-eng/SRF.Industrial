@@ -15,6 +15,7 @@ public static class HostingExtensions
     /// - EventTransformationDispatcher
     /// - EventProcessingDispatcher
     /// </summary>
+    [Obsolete("This library is discontinued")]
     public static IServiceCollection AddBasicEventsProcessing<TEvent>(this IServiceCollection services) where TEvent : class, IEvent
     {
         var transformQueueKey = "EventTransformation";

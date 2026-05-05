@@ -1,3 +1,6 @@
+# Generated source files
+**/*.generated.cs
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
